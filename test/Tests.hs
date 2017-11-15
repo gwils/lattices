@@ -20,12 +20,12 @@ import Algebra.PartialOrd
 
 import qualified Algebra.Lattice.Divisibility as Div
 import qualified Algebra.Lattice.Dropped as D
-import qualified Algebra.Lattice.Flat as F
 import qualified Algebra.Lattice.Levitated as L
 import qualified Algebra.Lattice.Lexicographic as LO
 import qualified Algebra.Lattice.Lifted as U
 import qualified Algebra.Lattice.Op as Op
 import qualified Algebra.Lattice.Ordered as O
+import qualified Algebra.Lattice.Wide as W
 
 import Data.IntMap (IntMap)
 import Data.IntSet (IntSet)
@@ -57,17 +57,18 @@ tests = testGroup "Tests"
   , latticeLaws "Ordered" True (Proxy :: Proxy (O.Ordered Int))
   , latticeLaws "Divisibility" True (Proxy :: Proxy (Div.Divisibility Int))
   , latticeLaws "LexOrdered" True (Proxy :: Proxy (LO.Lexicographic (O.Ordered Int) (O.Ordered Int)))
+  , latticeLaws "Wide" False (Proxy :: Proxy (W.Wide Int))
   , latticeLaws "Lexicographic" False (Proxy :: Proxy (LO.Lexicographic (Set Bool) (Set Bool)))
   , latticeLaws "Lexicographic" False (Proxy :: Proxy (LO.Lexicographic M2 M2)) -- non distributive!
   , testProperty "Lexicographic M2 M2 contains M3" $ QC.property $
       isJust searchM3LexM2
   , monadLaws "Dropped" (Proxy1 :: Proxy1 D.Dropped)
-  , monadLaws "Flat" (Proxy1 :: Proxy1 F.Flat)
   , monadLaws "Levitated" (Proxy1 :: Proxy1 L.Levitated)
   , monadLaws "Lexicographic" (Proxy1 :: Proxy1 (LO.Lexicographic Bool))
   , monadLaws "Lifted" (Proxy1 :: Proxy1 U.Lifted)
   , monadLaws "Op" (Proxy1 :: Proxy1 Op.Op)
   , monadLaws "Ordered" (Proxy1 :: Proxy1 O.Ordered)
+  , monadLaws "Wide" (Proxy1 :: Proxy1 W.Wide)
   ]
 
 monadLaws :: forall (m :: * -> *). ( Monad m
@@ -200,10 +201,10 @@ instance Arbitrary a => Arbitrary (D.Dropped a) where
                         , (9, D.Drop <$> arbitrary)
                         ]
 
-instance Arbitrary a => Arbitrary (F.Flat a) where
-  arbitrary = frequency [ (1, pure F.Top)
-                        , (1, pure F.Bottom)
-                        , (9, F.Flat <$> arbitrary)
+instance Arbitrary a => Arbitrary (W.Wide a) where
+  arbitrary = frequency [ (1, pure W.Top)
+                        , (1, pure W.Bottom)
+                        , (9, W.Middle <$> arbitrary)
                         ]
 
 instance Arbitrary a => Arbitrary (U.Lifted a) where
